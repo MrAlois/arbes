@@ -44,11 +44,11 @@ public class TelephoneBillCalculatorImpl implements TelephoneBillCalculator{
                         }
                 ));
 
+        applyPromotion(callPriceMap);
+
         callPriceMap.forEach((key, value) -> log.info("Entry: {} -> {}", key, value));
 
-        val finalPriceMap = applyPromotion(callPriceMap);
-
-        return finalPriceMap.values().stream()
+        return callPriceMap.values().stream()
                 .flatMap(List::stream) // Flatten the list of BigDecimal values
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
@@ -93,7 +93,7 @@ public class TelephoneBillCalculatorImpl implements TelephoneBillCalculator{
      * Applices current promos (if I had more time, I would separate it into classes, and apply the promos
      * depending on condition.
      */
-    protected static Map<String, ArrayList<BigDecimal>> applyPromotion(Map<String, ArrayList<BigDecimal>> dataMap){
+    protected static void applyPromotion(Map<String, ArrayList<BigDecimal>> dataMap){
         val maxListSize = dataMap.values().stream()
                 .mapToInt(List::size)
                 .max()
@@ -105,7 +105,7 @@ public class TelephoneBillCalculatorImpl implements TelephoneBillCalculator{
                 .toList();
 
         if(mostCalledNumbers.isEmpty())
-            return dataMap;
+            return;
 
         val mostCalledNumber = mostCalledNumbers.size() > 1
                 ? mostCalledNumbers.stream().max(Long::compareTo)
@@ -117,7 +117,6 @@ public class TelephoneBillCalculatorImpl implements TelephoneBillCalculator{
                 .orElseThrow();
 
         entry.setValue(new ArrayList<>());
-        return dataMap;
     }
 
     /**

@@ -31,6 +31,7 @@ class TelephoneBillCalculatorImplTest {
         assertEquals(0.0, result.doubleValue());
     }
 
+    // The most called number will be reset
     @Test
     void calculatePriceSimple() throws URISyntaxException {
         val resource = Path.of(ClassLoader.getSystemResource("multiple_numbers.csv").toURI());
@@ -42,5 +43,19 @@ class TelephoneBillCalculatorImplTest {
         val result = calculator.calculate(logData);
 
         assertEquals(9.5, result.doubleValue());
+    }
+
+    // Data withing day interval, outside it and with > 5 minutes
+    @Test
+    void calculatePriceComplex() throws URISyntaxException {
+        val resource = Path.of(ClassLoader.getSystemResource("multiple_numbers_complex.csv").toURI());
+
+        assertNotNull(resource);
+        val logData = FileUtils.parseCsvFile(resource.toAbsolutePath().toString());
+
+        val calculator = new TelephoneBillCalculatorImpl();
+        val result = calculator.calculate(logData);
+
+        assertEquals(223.7, result.doubleValue());
     }
 }
